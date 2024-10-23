@@ -1,9 +1,6 @@
-'use client'
-import { SignInButton, UserButton } from '@clerk/clerk-react'
-import { Authenticated, Unauthenticated } from 'convex/react'
-
 import { ModeToggle } from '@/components/mode-toggle'
 import Image from 'next/image'
+import HeaderActions from './header-actions'
 
 const Header = () => {
     return (
@@ -19,16 +16,9 @@ const Header = () => {
                     />
                     BigBrain
                 </div>
-                <div>
-                    <Unauthenticated>
-                        <SignInButton />
-                    </Unauthenticated>
-                    <Authenticated>
-                        <div className="flex gap-4">
-                            <ModeToggle />
-                            <UserButton />
-                        </div>
-                    </Authenticated>
+                <div className="flex items-center gap-4">
+                    <ModeToggle />
+                    <HeaderActions />
                 </div>
             </div>
         </div>
