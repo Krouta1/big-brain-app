@@ -21,6 +21,7 @@ import LoadingButton from '@/components/loading-button'
 
 const uploadDocFormSchema = z.object({
     title: z.string().min(2).max(250),
+    file: z.instanceof(File),
 })
 
 const UploadDocumentForm = ({
@@ -37,10 +38,28 @@ const UploadDocumentForm = ({
 
     // Create a document function
     const createDocument = useMutation(api.documents.createDocument)
+    const generateUploadUrl = useMutation(api.documents.generateUploadUrl)
 
     // on submit call createDocument function with provided values
     async function onSubmit(values: z.infer<typeof uploadDocFormSchema>) {
-        await createDocument(values)
+        //get url to upload file
+        const url = await generateUploadUrl()
+
+        //upload file to th db (s3 bucket)
+        const result = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': values.file.type },
+            body: values.file,
+        })
+
+        //get storage id from the response, it is in Convex docs
+        const { storageId } = await result.json()
+        await createDocument({
+            title: values.title,
+            fileId: storageId,
+        })
+
+        //call onUploadSuccess function to close the modal
         onUploadSuccess()
     }
 
@@ -57,6 +76,29 @@ const UploadDocumentForm = ({
                                 <Input
                                     placeholder="random document"
                                     {...field}
+                                />
+                            </FormControl>
+                            <FormDescription>
+                                This is your document name.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="file"
+                    render={({ field: { value, onChange, ...fieldProps } }) => (
+                        <FormItem>
+                            <FormLabel>Username</FormLabel>
+                            <FormControl>
+                                <Input
+                                    {...fieldProps}
+                                    type="file"
+                                    accept=".txt,.md,.mdx,.doc,.docx,.xml"
+                                    onChange={(event) => {
+                                        onChange(event.target.files?.[0] as any)
+                                    }}
                                 />
                             </FormControl>
                             <FormDescription>

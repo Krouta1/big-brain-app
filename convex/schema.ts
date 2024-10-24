@@ -1,9 +1,10 @@
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable } from 'convex/server'
+import { v } from 'convex/values'
 
 export default defineSchema({
-  documents: defineTable({
-    title: v.string(),
-    tokenIdentifier: v.string(),
-  }).index("by_tokenIdentifier", ["tokenIdentifier"]),
-});
+    documents: defineTable({
+        title: v.string(),
+        tokenIdentifier: v.string(),
+        fileId: v.string(),
+    }).index('by_tokenIdentifier', ['tokenIdentifier']),
+})
